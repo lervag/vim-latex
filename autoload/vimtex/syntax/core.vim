@@ -470,6 +470,11 @@ function! vimtex#syntax#core#init() abort " {{{1
     if g:vimtex_syntax_conceal.cites
       call s:match_conceal_cites_{g:vimtex_syntax_conceal_cites.type}()
     endif
+
+    " Conceal section commands
+    if g:vimtex_syntax_conceal.sections
+      call s:match_conceal_sections()
+    endif
   endif
 
   " }}}2
@@ -601,6 +606,8 @@ function! vimtex#syntax#core#init_highlights() abort " {{{1
   highlight def link texNewenvOpt          texOpt
   highlight def link texNewenvParm         texParm
   highlight def link texOptEqual           texSymbol
+  highlight def link texPartConcealed      texCmdPart
+  highlight def link texPartConcArgTitle   texPartArgTitle
   highlight def link texRefOpt             texOpt
   highlight def link texRefConcealedOpt1   texRefOpt
   highlight def link texRefConcealedOpt2   texRefOpt
@@ -1643,6 +1650,18 @@ function! s:match_conceal_cites_icon() abort " {{{1
   execute 'syntax match texCmdRefConcealed'
         \ '"\\cite[tp]\?\*\?\%(\[[^]]*\]\)\{,2}{[^}]*}"'
         \ 'conceal cchar=' . g:vimtex_syntax_conceal_cites.icon
+endfunction
+
+" }}}1
+function! s:match_conceal_sections() abort " {{{1
+  syntax match texCmdPart "\v\\%(sub)*section>\*?" contains=texPartConcealed nextgroup=texPartConcArgTitle
+  syntax match texPartConcealed "\\" contained conceal cchar=#
+  syntax match texPartConcealed "sub" contained conceal cchar=#
+  syntax match texPartConcealed "section\*\?" contained conceal cchar= 
+
+  call vimtex#syntax#core#new_arg('texPartConcArgTitle', {
+        \ 'opts': 'contained keepend concealends'
+        \})
 endfunction
 
 " }}}1
